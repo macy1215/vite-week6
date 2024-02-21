@@ -19,11 +19,11 @@ export default {
     //  先驗證 在取資料
     checkAdmin() {
       axios.post(`${VITE_URL}/v2/api/user/check`)
-        .then((res) => {
-          console.log('驗證成功：', res.data.success);
+        .then(() => {
+          // console.log('驗證成功：', res.data.success);
         })
         .catch(() => {
-          alert('驗證失敗');
+          // alert('驗證失敗');
           this.$router.push('/login');
           // 回到 登入頁面
         });
