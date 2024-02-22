@@ -2,6 +2,16 @@
     <VueLoading v-model:active="isLoading"/>
         <div class="mt-4 container">
           <h5 class="mb-5">這是產品列表頁</h5>
+          <!-- 產品Modal -->
+          <ProductModal
+            ref="detialModal"
+            :add-to-cart="addToCart"
+            :product="product"
+            :status="status"
+            @add-to-cart="addToCart" />
+          <!-- <ProductModal/> -->
+          <!-- 產品Modal -->
+
           <table class="table align-middle">
             <thead>
               <tr>
@@ -34,17 +44,18 @@
                     <button
                         type="button"
                         class="btn btn-outline-secondary"
-                        @click="openModal(item)"
-                        data-bs-toggle="modal"
-                        :disabled="item.num === 0">
+                        @click="getProduct(item.id)"
+                        :disabled=" status.loadingItem === item.id">
                       <span
                         class="spinner-border spinner-border-sm"
                         role="status" aria-hidden="true" v-if="item.num === 0"></span>
                       查看更多
                     </button>
-                    <button type="button" class="btn btn-outline-danger"
-                    :disabled="item.id === status.addCartLoading"
-                      @click="addToCart(item.id,1)">
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      :disabled="item.id === status.addCartLoading"
+                      @click="addToCart(item.id)">
                       <span class="spinner-border spinner-border-sm"
                       role="status" aria-hidden="true"
                       v-if="item.id === status.addCartLoading" ></span>
@@ -55,12 +66,6 @@
               </tr>
             </tbody>
           </table>
-          <!-- 產品Modal -->
-          <!-- <ProductModal :temp-Product="{tempProduct , status }"
-          @add-to-cart="addToCart" ref="ProductModal" /> -->
-          <ProductModal/>
-          <!-- <ProductModal ref="ProductModal" :product="product" @add-to-cart="addToCart"/> -->
-          <!-- 產品Modal -->
         </div>
 </template>
 
@@ -72,9 +77,6 @@ export default {
     return {
       products: [''], // 資料存放
       product: {}, // 單一產品
-      tempProduct: {
-        imagesUrl: [],
-      }, // 暫存區
       myModal: null, //  產品 modal
       page: {},
       status: {
@@ -105,49 +107,50 @@ export default {
         .then((res) => {
           this.products = res.data.products;
           this.isLoading = false;
+          console.log(url);
+          console.log(res);
         })
         .catch((err) => {
           alert(err.response.data.message);
         });
     },
     //  單一產品
-    // getProduuct(id) {
-    //   // console.log(id);
-    //   this.isLoading = true;
-    //   this.status.loadingItem = id;
-    //   const url = `${import.meta.env.VITE_URL}/api/${import.meta.env.VITE_NAME}/products/${id}`;
-    //   this.$http
-    //     .get(url)
-    //     .then((res) => {
-    //       this.status.loadingItem = '';
-    //       this.product = res.data.product;
-    //       this.isLoading = false;
-    //       this.$refs.productModal.openModal();
-    //     })
-    //     .catch((err) => {
-    //       alert(err.response.data.message);
-    //     });
-    // },
+    getProduct(id) {
+      this.isLoading = true;
+      this.status.loadingItem = id;
+      const url = `${import.meta.env.VITE_URL}/api/${import.meta.env.VITE_NAME}/product/${id}`;
+      this.$http
+        .get(url)
+        .then((res) => {
+          this.status.loadingItem = '';
+          this.product = res.data.product;
+          this.isLoading = false;
+          this.$refs.detialModal.openModal();
+        })
+        .catch((err) => {
+          this.status.loadingItem = '';
+          alert(err.response.data.message);
+        });
+    },
     // 加入購物車
     addToCart(productId, qty = 1) {
-      console.log(productId, qty);
-      // this.status.addCartLoading = productId;
-      // const order = {
-      //   productId,
-      //   qty,
-      // };
-      // const url = `${import.meta.env.VITE_URL}/api/${import.meta.env.VITE_NAME}/cart`;
-      // this.$http
-      //   .post(url, { data: order })
-      //   .then((res) => {
-      //     alert(res.data.message);
-      //     this.status.addCartLoading = '';
-      //     this.getCart();
-      //     this.$refs.productModal.closeModal();
-      //   })
-      //   .catch((err) => {
-      //     alert(err.response.data.message);
-      //   });
+      this.status.addCartLoading = productId;
+      const order = {
+        product_id: productId,
+        qty,
+      };
+      const url = `${import.meta.env.VITE_URL}/api/${import.meta.env.VITE_NAME}/cart`;
+      this.$http
+        .post(url, { data: order })
+        .then((res) => {
+          alert(res.data.message);
+          this.status.addCartLoading = '';
+          this.getCart();
+          this.$refs.productModal.closeModal();
+        })
+        .catch((err) => {
+          alert(err.response.data.message);
+        });
     },
   },
 };

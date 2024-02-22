@@ -18,7 +18,7 @@ export default {
   methods: {
     //  先驗證 在取資料
     checkAdmin() {
-      axios.post(`${VITE_URL}/v2/api/user/check`)
+      axios.post(`${VITE_URL}/api/user/check`)
         .then(() => {
           // console.log('驗證成功：', res.data.success);
         })

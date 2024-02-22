@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     login() {
-      axios.post(`${VITE_URL}/v2/admin/signin`, this.user)
+      axios.post(`${VITE_URL}/admin/signin`, this.user)
         .then((res) => {
           const { token, expired } = res.data; // 解構 將token 跟時間抓到
           //   console.log(token, expired);
