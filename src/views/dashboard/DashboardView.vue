@@ -23,7 +23,7 @@ export default {
           // console.log('驗證成功：', res.data.success);
         })
         .catch(() => {
-          // alert('驗證失敗');
+          alert('還沒登入請先登入');
           this.$router.push('/login');
           // 回到 登入頁面
         });
